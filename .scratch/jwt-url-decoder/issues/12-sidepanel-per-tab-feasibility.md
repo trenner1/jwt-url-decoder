@@ -1,5 +1,5 @@
 Type: research
-Status: claimed
+Status: resolved
 
 ## Question
 
@@ -24,3 +24,21 @@ Specifically confirm, citing official Chrome extension docs / source:
   re-sync content on `tabs.onActivated`?
 - Minimum Chrome version and required manifest fields/permissions
   (`"sidePanel"` permission, `default_path`, etc.) for the behavior above.
+
+## Answer
+
+Confirmed against official Chrome docs and Chromium source: the Side Panel
+API supports everything the architecture assumes. `sidePanel.setOptions({
+tabId, path, enabled })` creates a genuinely separate per-tab panel instance
+(omitting `tabId` only changes the global default), so each tab can show
+its own decoded tokens. `sidePanel.open()` does require an active user
+gesture — Chromium enforces this with a hard `user_gesture()` check, not
+just doc guidance — so it must be called as early as possible inside a
+gesture-bearing listener like `action.onClicked`, not after async work.
+The panel does not auto-sync content on tab switch; the extension must
+listen for `tabs.onActivated` (per the official "Switch to a different
+panel" example) to re-apply the correct per-tab options, otherwise a
+newly-active tab can show stale global state. Manifest requirements are
+the `"sidePanel"` permission plus a `"side_panel": { "default_path": ... }`
+key; the base API needs Chrome 114+, with `open()` requiring 116+. Full
+findings with citations: [research/sidepanel-per-tab-behavior.md](research/sidepanel-per-tab-behavior.md).
