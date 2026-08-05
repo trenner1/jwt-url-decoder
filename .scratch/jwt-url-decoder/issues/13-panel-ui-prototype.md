@@ -1,5 +1,5 @@
 Type: prototype
-Status: claimed
+Status: resolved
 
 ## Question
 
@@ -25,3 +25,32 @@ Depends conceptually on
 that ticket surfaces a per-tab UX wrinkle (e.g. a "which tab" affordance
 needed) — not a hard block, but worth checking that ticket's answer before
 finalizing the layout.
+
+## Answer
+
+Built three structurally different variants via `/prototype` (static
+HTML/CSS/JS, three-way switcher, sample id_token/access_token/expired
+tokens) plus an independent badge-style comparison strip (dot vs. numeric
+count — left undecided, no strong preference surfaced either way, dot is
+the simpler default). **Variant C won: status banner + claim chips +
+terminal-style raw block.**
+
+Winning layout:
+
+- **List view**: each token as a pill with a colored left border (green
+  valid / amber expiring / red expired), type label + truncated token —
+  no expiry text in the list, that's reserved for the detail view's banner.
+- **Detail view**: leads with a full-width colored status banner as the
+  primary affordance (e.g. "Valid · expires in 53m", "Expired · 1h ago"),
+  followed by humanized claims (`alg`/`iss`/`aud`/`sub`) as a wrapped row
+  of chips rather than a list or table.
+- **Raw data**: header/payload/signature shown in a single dark
+  terminal-style block, one labeled line per segment (`header ▸`,
+  `payload ▸`, `signature ▸`), with a hover-to-reveal copy button per line
+  plus one "copy raw token" button in the block's toolbar.
+
+Full three-variant prototype captured as a primary source on the throwaway
+branch `prototype/panel-ui` (commit `a6a60f6`) — not kept on `master`,
+per this repo's `/prototype` convention. Variants A (card stack +
+accordion) and B (compact table + tabs) are preserved there if any of
+their pieces are worth revisiting later.

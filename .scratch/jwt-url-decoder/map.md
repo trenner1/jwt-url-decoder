@@ -34,6 +34,7 @@ persistence, no network calls.
 - [Slide-out is the Chrome Side Panel API, not a page overlay](issues/10-slideout-mechanism-sidepanel.md) — `chrome.sidePanel`, not a content-script-injected overlay; avoids host-page CSS/z-index collisions.
 - [Matching requires decode validation, not just structural shape](issues/11-match-validation.md) — a hit must base64url-decode to JSON with an `alg` key in the header, not just match the dot-delimited shape.
 - [chrome.sidePanel supports the per-tab architecture this design assumes](issues/12-sidepanel-per-tab-feasibility.md) — confirmed via official docs + Chromium source: `setOptions({tabId, ...})` gives genuinely separate per-tab panels, `open()` requires an active user gesture (enforced, not just advised), and the extension must listen for `tabs.onActivated` itself since the panel doesn't auto-sync on tab switch.
+- [Panel UI: status banner + claim chips + terminal-style raw block](issues/13-panel-ui-prototype.md) — Variant C won over a card-stack/accordion layout and a compact-table/tabs layout; list view uses color-bordered pills, detail view leads with a colored validity banner, claims shown as wrapped chips, raw header/payload/signature in one terminal-style block with per-line hover-copy. Badge style (dot vs. count) left as a soft default of dot — no strong preference surfaced.
 
 ## Not yet specified
 
@@ -41,8 +42,8 @@ persistence, no network calls.
   once the decisions above are locked; folds into the final spec write-up,
   not a decision in its own right.
 - Performance/UX handling for pages with an unusually large number of
-  matches — not yet a sharp question; revisit if the UI prototype ticket
-  surfaces it.
+  matches — the prototype didn't stress-test this; low-stakes enough to
+  leave as an implementation judgment call rather than a ticket.
 
 ## Out of scope
 
