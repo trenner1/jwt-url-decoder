@@ -33,6 +33,7 @@ persistence, no network calls.
 - [Non-goals for v1](issues/09-non-goals.md) — no options page, no token history/log, no token editing/re-signing, no non-JWT formats, no non-Chrome browsers.
 - [Slide-out is the Chrome Side Panel API, not a page overlay](issues/10-slideout-mechanism-sidepanel.md) — `chrome.sidePanel`, not a content-script-injected overlay; avoids host-page CSS/z-index collisions.
 - [Matching requires decode validation, not just structural shape](issues/11-match-validation.md) — a hit must base64url-decode to JSON with an `alg` key in the header, not just match the dot-delimited shape.
+- [chrome.sidePanel supports the per-tab architecture this design assumes](issues/12-sidepanel-per-tab-feasibility.md) — confirmed via official docs + Chromium source: `setOptions({tabId, ...})` gives genuinely separate per-tab panels, `open()` requires an active user gesture (enforced, not just advised), and the extension must listen for `tabs.onActivated` itself since the panel doesn't auto-sync on tab switch.
 
 ## Not yet specified
 
