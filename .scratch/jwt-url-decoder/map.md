@@ -1,5 +1,8 @@
 # Map: JWT URL Decoder Chrome Extension
 
+**Destination reached** — assembled as [spec.md](spec.md), labeled
+`ready-for-agent`.
+
 ## Destination
 
 A spec for a Chrome extension (Manifest V3) that finds JWTs anywhere in the
