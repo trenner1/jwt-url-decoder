@@ -1,8 +1,9 @@
 export type TokenStatus = "valid" | "expiring" | "expired";
+export type TokenType = "id_token" | "access_token" | "token";
 
 export interface DecodedToken {
   token: string;
-  type: string;
+  type: TokenType;
   header: Record<string, unknown> & { alg: string };
   payload: Record<string, unknown>;
   signature: string;
@@ -13,8 +14,8 @@ export interface DecodedToken {
 const JWT_PATTERN = /[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g;
 const EXPIRING_SOON_SECONDS = 600; // < 10 minutes left counts as "expiring"
 
-const KNOWN_PARAM_TYPES = new Set(["id_token", "access_token"]);
-const FALLBACK_TYPE = "token";
+const KNOWN_PARAM_TYPES = new Set<TokenType>(["id_token", "access_token"]);
+const FALLBACK_TYPE: TokenType = "token";
 
 // Uses atob rather than Buffer — this module runs in a Chrome extension
 // service worker and in the Side Panel (browser contexts), neither of
@@ -36,11 +37,15 @@ function base64UrlDecodeJson(segment: string): Record<string, unknown> | null {
   }
 }
 
-function guessTypeFromUrl(url: string, token: string): string {
+function isKnownParamType(paramName: string): paramName is TokenType {
+  return (KNOWN_PARAM_TYPES as Set<string>).has(paramName);
+}
+
+function guessTypeFromUrl(url: string, token: string): TokenType {
   const paramPattern = new RegExp(`([A-Za-z0-9_]+)=${escapeRegExp(token)}`);
   const match = url.match(paramPattern);
   const paramName = match?.[1];
-  return paramName && KNOWN_PARAM_TYPES.has(paramName) ? paramName : FALLBACK_TYPE;
+  return paramName && isKnownParamType(paramName) ? paramName : FALLBACK_TYPE;
 }
 
 function escapeRegExp(value: string): string {

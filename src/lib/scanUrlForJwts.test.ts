@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { scanUrlForJwts } from "./scanUrlForJwts";
 
+function b64url(obj: object) {
+  return Buffer.from(JSON.stringify(obj)).toString("base64url");
+}
+
 // Fixture built the same way as the Wayfinder prototype's sample data:
 // header/payload are real base64url-encoded JSON, signature is a random
 // placeholder (unverified — this module never checks signatures).
 function makeJwt(header: object, payload: object, signature = "sig") {
-  const b64url = (obj: object) =>
-    Buffer.from(JSON.stringify(obj)).toString("base64url");
   return `${b64url(header)}.${b64url(payload)}.${signature}`;
 }
 
@@ -59,8 +61,6 @@ describe("scanUrlForJwts", () => {
   });
 
   it("excludes a real-looking match whose header decodes but lacks an alg key", () => {
-    const b64url = (obj: object) =>
-      Buffer.from(JSON.stringify(obj)).toString("base64url");
     const headerWithoutAlg = b64url({ typ: "JWT" });
     const payload = b64url({ sub: "user-1" });
     const url = `https://app.example.com/?token=${headerWithoutAlg}.${payload}.sig`;
@@ -120,4 +120,23 @@ describe("scanUrlForJwts", () => {
       expect(result[0].relativeExpiry).toMatch(expectedPattern as RegExp);
     }
   );
+
+  it("assigns each token its own independent status within a single multi-token URL", () => {
+    const now = Math.floor(Date.now() / 1000);
+    const validToken = makeJwt({ alg: "RS256" }, { sub: "valid-1", exp: now + 3600 });
+    const expiringToken = makeJwt({ alg: "RS256" }, { sub: "expiring-1", exp: now + 300 });
+    const expiredToken = makeJwt({ alg: "RS256" }, { sub: "expired-1", exp: now - 3600 });
+
+    const url =
+      `https://app.example.com/?valid=${validToken}` +
+      `&expiring=${expiringToken}` +
+      `&expired=${expiredToken}`;
+
+    const result = scanUrlForJwts(url);
+
+    const bySub = (sub: string) => result.find((r) => r.payload.sub === sub);
+    expect(bySub("valid-1")?.status).toBe("valid");
+    expect(bySub("expiring-1")?.status).toBe("expiring");
+    expect(bySub("expired-1")?.status).toBe("expired");
+  });
 });
