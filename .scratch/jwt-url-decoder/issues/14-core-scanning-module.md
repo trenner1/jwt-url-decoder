@@ -52,4 +52,12 @@ the full decision record this implements.
   decoding, since this module runs in a Chrome extension service worker
   and in the Side Panel — neither has Node's `Buffer` global.
 - Code: `src/lib/scanUrlForJwts.ts`. Tests: `src/lib/scanUrlForJwts.test.ts`
-  (9 tests, all passing). Typechecked clean with `npm run typecheck`.
+  (10 tests, all passing). Typechecked clean with `npm run typecheck`.
+- `/code-review` pass (commit f5983d3) applied two standards fixes
+  (`type` given its own `TokenType` union; a duplicated test helper
+  hoisted) and one spec fix (added a test proving each token gets an
+  independent `status` within a single multi-token URL, not just across
+  separate URLs). The `alg`-must-be-a-string check was flagged as
+  stricter than the ticket's literal wording but left as-is — RFC 7515
+  mandates `alg` is a string, so this is the spec-conformant read, not a
+  bug.
