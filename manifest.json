@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "JWT URL Decoder",
+  "version": "0.1.0",
+  "description": "Detects JWTs in the current tab's URL and decodes them locally.",
+  "minimum_chrome_version": "116",
+  "background": { "service_worker": "dist/background.js" },
+  "action": {},
+  "host_permissions": ["<all_urls>"],
+  "permissions": ["webNavigation"]
+}
