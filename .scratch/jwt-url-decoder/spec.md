@@ -267,11 +267,11 @@ judgment call rather than a specified behavior — reasonable defaults
   deliberately near-miss non-JWT strings (dot-delimited base64-ish text
   that fails decode or lacks an `alg` key) to confirm they're correctly
   excluded.
-- **The background service worker is covered by contract tests, not
-  manual QA.** Loading the unpacked extension is not available as a
-  verification step: this machine's Chrome is cloud-managed and company
-  policy does not permit an agent to load browser extensions. Instead
-  `src/background/background.test.ts` injects a fake `chrome` global,
+- **The background service worker is covered by contract tests.** An
+  agent may not load browser extensions here (company policy; this
+  machine's Chrome is also cloud-managed), so the automated layer stops
+  at the call contract: `src/background/background.test.ts` injects a
+  fake `chrome` global,
   fires synthetic `webNavigation`/`tabs`/`action` events, and asserts the
   exact calls the worker makes — badge text and `tabId` scoping, the
   `frameId !== 0` subframe filter, per-tab `sidePanel.setOptions`, and
