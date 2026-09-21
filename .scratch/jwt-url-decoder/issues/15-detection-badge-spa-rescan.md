@@ -28,14 +28,14 @@ badge reflects that tab's own URL only. See
       correct badge state — no bleed-through from one tab to another.
 - [x] Visiting a page with no JWTs in the URL shows no badge.
 
-Verified by the contract tests in `src/background/background.test.ts`
-rather than by loading the extension: loading it is not an available
-verification step (see [spec.md](../spec.md), "Testing Decisions").
+Badge behavior was confirmed in Chrome on 2026-09-21 with the extension
+loaded unpacked: the dot appears on a token-bearing URL, stays off on a
+token-free one, and two tabs keep their own state.
 
-What the contract tests establish is that this worker makes the right
-`chrome.*` calls — correct badge text, correct `tabId` on every call,
-subframe events ignored, `onHistoryStateUpdated` wired to the same
-handler as `onCommitted`. What no test here establishes is Chrome's own
-behavior: that a dot actually paints on the toolbar, and that a real
-SPA's `replaceState` fires before the app strips the token. Both remain
-unproven against a live browser.
+The contract tests in `src/background/background.test.ts` hold the same
+ground automatically, since an agent cannot re-run the browser check (see
+[spec.md](../spec.md), "Testing Decisions").
+
+Still unconfirmed: that a real SPA's `replaceState` fires early enough
+for the scan to catch a token before the app strips it. That is a timing
+race against a specific kind of app, and no test URL exercises it.

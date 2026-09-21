@@ -38,11 +38,12 @@ relying on a fresh document load: a global panel is one document shared by
 every tab in the window, and tab-scoped entries support view caching, so a
 reload on tab switch is not guaranteed.
 
-The last box is covered by the contract tests in
-`src/background/background.test.ts` plus the headless panel render, not by
-loading the extension — see [spec.md](../spec.md), "Testing Decisions".
-Those establish that each tab gets its own `sidePanel.setOptions({tabId,
-…})`, that `sidePanel.open()` is the first call in the click handler, and
-that the panel derives its content from whichever tab is active. They do
-not establish that Chrome grants the gesture or genuinely isolates two
-live panels; that remains unproven against a real browser.
+Confirmed in Chrome on 2026-09-21 with the extension loaded unpacked:
+clicking the toolbar icon opens the panel (so Chrome does grant the
+gesture from `action.onClicked`), and two tabs each show their own
+token rather than the other's.
+
+The contract tests in `src/background/background.test.ts` plus the
+headless panel render hold the same ground automatically — per-tab
+`sidePanel.setOptions({tabId, …})`, `sidePanel.open()` first in the click
+handler, and content derived from whichever tab is active.
