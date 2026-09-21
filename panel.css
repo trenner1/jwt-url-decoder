@@ -1,0 +1,156 @@
+:root {
+  --green: #1a7f37;
+  --green-bg: #daf5e2;
+  --amber: #9a6700;
+  --amber-bg: #fff2cc;
+  --red: #cf222e;
+  --red-bg: #ffebe9;
+  --ink: #1b1f23;
+  --muted: #6e7781;
+  --border: #d0d7de;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: #f6f8fa;
+  margin: 0;
+  padding: 12px;
+}
+
+.token + .token {
+  margin-top: 18px;
+}
+
+.banner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.banner-valid {
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.banner-expiring {
+  background: var(--amber-bg);
+  color: var(--amber);
+}
+
+.banner-expired {
+  background: var(--red-bg);
+  color: var(--red);
+}
+
+.banner-type {
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.banner-status {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.chip {
+  font-size: 11px;
+  background: #f0f3f6;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terminal {
+  background: #0d1117;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.terminal-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: #161b22;
+  color: #8b949e;
+  font-size: 10px;
+}
+
+.terminal-line {
+  position: relative;
+  padding: 8px 10px;
+  border-top: 1px solid #21262d;
+}
+
+.terminal-prefix {
+  display: block;
+  color: #6e9dcf;
+  font-size: 10px;
+  margin-bottom: 2px;
+}
+
+.terminal-line pre {
+  margin: 0;
+  color: #c9d1d9;
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.terminal-line-signature pre {
+  color: #8b949e;
+}
+
+.copy-all {
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  background: none;
+  color: #c9d1d9;
+  font-size: 10px;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+
+.copy-line {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  opacity: 0;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  background: #161b22;
+  color: #c9d1d9;
+  font-size: 9px;
+  padding: 2px 5px;
+  cursor: pointer;
+}
+
+.terminal-line:hover .copy-line,
+.copy-line:focus {
+  opacity: 1;
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 13px;
+}

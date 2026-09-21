@@ -10,18 +10,27 @@ git branch, commit `a6a60f6`, for visual reference.
 
 **Blocked by:** 16 (sidepanel-open-minimal-view).
 
-- [ ] A full-width colored status banner is the first thing shown,
+**Status:** resolved
+
+- [x] A full-width colored status banner is the first thing shown,
       reflecting the token's `status` — e.g. "Valid · expires in 53m"
       (green), "Expiring soon · ..." (amber), "Expired · 1h ago" (red).
-- [ ] Humanized claims (`alg`, `iss`, `aud`, `sub`) render as a wrapped
+- [x] Humanized claims (`alg`, `iss`, `aud`, `sub`) render as a wrapped
       row of chips beneath the banner — not a table or list.
-- [ ] A single dark, terminal-styled block below the chips contains one
+- [x] A single dark, terminal-styled block below the chips contains one
       labeled line each for `header ▸`, `payload ▸`, and `signature ▸`
       (pretty-printed JSON for the first two, the raw signature segment
       for the third).
-- [ ] Hovering a line in the terminal block reveals a per-line copy
+- [x] Hovering a line in the terminal block reveals a per-line copy
       button; the block's toolbar has one "copy raw token" button that
       copies the whole token string.
-- [ ] Visually matches the winning prototype variant's structure
+- [x] Visually matches the winning prototype variant's structure
       (banner → chips → terminal block) closely enough to be recognizable
       as the same design when compared side by side.
+
+Claims are omitted rather than rendered as "undefined" when absent, and
+the banner drops the `·` separator for tokens with no `exp`.
+
+Copy buttons rely on the transient activation of their own click, so no
+`clipboardWrite` permission is needed; a rejected write surfaces as
+"Copy failed" on the button rather than failing silently.
