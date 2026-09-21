@@ -267,12 +267,22 @@ judgment call rather than a specified behavior — reasonable defaults
   deliberately near-miss non-JWT strings (dot-delimited base64-ish text
   that fails decode or lacks an `alg` key) to confirm they're correctly
   excluded.
-- The background service worker's use of `chrome.tabs`, `webNavigation`,
-  and `sidePanel`, and the Side Panel UI's rendering of a `DecodedToken[]`
-  into the list/detail layout, are both thin orchestration around
-  `scanUrlForJwts` — glue code, not logic-bearing. They are not unit
-  tested; verify manually by loading the unpacked extension in Chrome and
-  exercising the user stories above against real OAuth/SSO redirect URLs.
+- **The background service worker is covered by contract tests, not
+  manual QA.** Loading the unpacked extension is not available as a
+  verification step: this machine's Chrome is cloud-managed and company
+  policy does not permit an agent to load browser extensions. Instead
+  `src/background/background.test.ts` injects a fake `chrome` global,
+  fires synthetic `webNavigation`/`tabs`/`action` events, and asserts the
+  exact calls the worker makes — badge text and `tabId` scoping, the
+  `frameId !== 0` subframe filter, per-tab `sidePanel.setOptions`, and
+  that `sidePanel.open()` is the first call in the click handler (the
+  user-gesture requirement, which no type or name can express). These
+  assert our side of the contract; they cannot prove Chrome's own
+  behavior.
+- The Side Panel UI's rendering of a `DecodedToken[]` is verified by
+  loading the real bundle against a stubbed `chrome.tabs` in headless
+  Chrome and screenshotting at panel widths (320px and 380px), covering
+  layout, status colors, and list-to-detail navigation.
 - This is a greenfield repository with no existing test suite or
   conventions to follow as prior art. If integration-level testing is
   wanted later, Chrome's own guidance points to Puppeteer with
