@@ -22,8 +22,63 @@ body {
   padding: 12px;
 }
 
-.token + .token {
-  margin-top: 18px;
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-left: 4px solid;
+  border-radius: 6px;
+  background: #fff;
+  padding: 8px 10px;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.pill-valid {
+  border-left-color: var(--green);
+}
+
+.pill-expiring {
+  border-left-color: var(--amber);
+}
+
+.pill-expired {
+  border-left-color: var(--red);
+}
+
+.pill-type {
+  flex-shrink: 0;
+  width: 90px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pill-token {
+  min-width: 0;
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.back {
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 0 0 8px;
+  cursor: pointer;
 }
 
 .banner {

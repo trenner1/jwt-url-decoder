@@ -13,6 +13,9 @@ const STATUS_LABEL: Record<TokenStatus, string> = {
 const root = document.createElement("main");
 document.body.append(root);
 
+let tokens: DecodedToken[] = [];
+let selected: number | null = null;
+
 async function activeTabUrl(): Promise<string> {
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -34,6 +37,10 @@ function claimText(value: unknown): string | undefined {
 function statusText(token: DecodedToken): string {
   const label = STATUS_LABEL[token.status];
   return token.relativeExpiry ? `${label} · ${token.relativeExpiry}` : label;
+}
+
+function truncateToken(token: string): string {
+  return `${token.slice(0, 16)}…${token.slice(-8)}`;
 }
 
 function copyOnClick(button: HTMLButtonElement, text: string): void {
@@ -143,9 +150,49 @@ function terminalView(token: DecodedToken): HTMLElement {
   return terminal;
 }
 
-function tokenView(token: DecodedToken): HTMLElement {
+function listView(): HTMLElement {
+  const list = document.createElement("div");
+  list.className = "list";
+
+  tokens.forEach((token, index) => {
+    const pill = document.createElement("button");
+    pill.className = `pill pill-${token.status}`;
+
+    const type = document.createElement("span");
+    type.className = "pill-type";
+    type.textContent = token.type;
+
+    const raw = document.createElement("span");
+    raw.className = "pill-token";
+    raw.textContent = truncateToken(token.token);
+
+    pill.append(type, raw);
+    pill.addEventListener("click", () => {
+      selected = index;
+      render();
+    });
+
+    list.append(pill);
+  });
+
+  return list;
+}
+
+function detailView(token: DecodedToken): HTMLElement {
   const section = document.createElement("section");
   section.className = "token";
+
+  if (tokens.length > 1) {
+    const back = document.createElement("button");
+    back.className = "back";
+    back.textContent = "← All tokens";
+    back.addEventListener("click", () => {
+      selected = null;
+      render();
+    });
+    section.append(back);
+  }
+
   section.append(bannerView(token), chipsView(token), terminalView(token));
   return section;
 }
@@ -157,11 +204,29 @@ function emptyView(): HTMLElement {
   return message;
 }
 
+function render(): void {
+  if (tokens.length === 0) {
+    root.replaceChildren(emptyView());
+    return;
+  }
+
+  if (selected === null) {
+    root.replaceChildren(listView());
+    return;
+  }
+
+  root.replaceChildren(detailView(tokens[selected]));
+}
+
 async function refresh(): Promise<void> {
-  const tokens = scanUrlForJwts(await activeTabUrl());
-  root.replaceChildren(
-    ...(tokens.length > 0 ? tokens.map(tokenView) : [emptyView()]),
-  );
+  const next = scanUrlForJwts(await activeTabUrl());
+  const sameTokens =
+    next.length === tokens.length &&
+    next.every((token, index) => token.token === tokens[index].token);
+
+  tokens = next;
+  if (!sameTokens) selected = tokens.length === 1 ? 0 : null;
+  render();
 }
 
 void refresh();
