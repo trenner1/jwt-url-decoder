@@ -12,21 +12,26 @@ for the confirmed API behavior this implements.
 **Blocked by:** 15 (detection-badge-spa-rescan) — needs per-tab detection
 already working to know when/what to show.
 
-- [ ] Manifest declares the `sidePanel` permission and a
+- [x] Manifest declares the `sidePanel` permission and a
       `"side_panel": {"default_path": ...}` key.
-- [ ] Background worker calls `sidePanel.setOptions({tabId, path,
+- [x] Background worker calls `sidePanel.setOptions({tabId, path,
       enabled})` per tab (not the global default) so each tab has a
       genuinely separate panel state.
-- [ ] `sidePanel.open()` is called as the first statement inside the
+- [x] `sidePanel.open()` is called as the first statement inside the
       `action.onClicked` listener — never after an `await` — since Chrome
       enforces the active-user-gesture requirement.
-- [ ] The panel itself calls `scanUrlForJwts` on the active tab's current
+- [x] The panel itself calls `scanUrlForJwts` on the active tab's current
       URL (via `chrome.tabs.query`) to derive what it shows — it does not
       receive token data via message-passing from the background worker.
-- [ ] Background worker listens for `tabs.onActivated` and re-applies the
+- [x] Background worker listens for `tabs.onActivated` and re-applies the
       newly active tab's `sidePanel` options, so switching tabs while the
       panel is open shows that tab's own tokens, not a stale previous
       tab's.
 - [ ] Verified manually: two tabs each with a different token in the URL,
       panel open, switching between them shows each tab's own decoded
       token, not the other's.
+
+The panel re-renders on `tabs.onActivated`/`tabs.onUpdated` rather than
+relying on a fresh document load: a global panel is one document shared by
+every tab in the window, and tab-scoped entries support view caching, so a
+reload on tab switch is not guaranteed.

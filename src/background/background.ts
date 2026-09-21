@@ -2,32 +2,29 @@ import { scanUrlForJwts } from "../lib/scanUrlForJwts";
 
 const BADGE_TEXT = "•";
 const BADGE_COLOR = "#4F46E5";
-
-// Set once, globally (no tabId): a tab-scoped setBadgeText call always uses
-// this as its color unless a tab-scoped color is set too, which we never do.
-// Avoids a redundant per-navigation IPC call to re-set an unchanging color.
-ignoreClosedTabErrors(chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR }));
+const PANEL_PATH = "panel.html";
 
 function ignoreClosedTabErrors(promise: Promise<void>): void {
   promise.catch((err) => {
     const message = err instanceof Error ? err.message : String(err);
     if (!message.includes("No tab with id")) {
-      console.error("chrome.action call failed", err);
+      console.error("chrome API call failed", err);
     }
   });
 }
 
-// Every scan is computed fresh from the event's `url` field. No chrome.storage,
-// no network calls, no persistence of any kind — this is a hard privacy
-// constraint for the extension, not a style preference.
+ignoreClosedTabErrors(chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR }));
+
 export function updateBadgeForTab(tabId: number, url: string | undefined): void {
   const tokens = scanUrlForJwts(url ?? "");
+  const text = tokens.length > 0 ? BADGE_TEXT : "";
+  ignoreClosedTabErrors(chrome.action.setBadgeText({ text, tabId }));
+}
 
-  if (tokens.length > 0) {
-    ignoreClosedTabErrors(chrome.action.setBadgeText({ text: BADGE_TEXT, tabId }));
-  } else {
-    ignoreClosedTabErrors(chrome.action.setBadgeText({ text: "", tabId }));
-  }
+function enablePanelForTab(tabId: number): void {
+  ignoreClosedTabErrors(
+    chrome.sidePanel.setOptions({ tabId, path: PANEL_PATH, enabled: true }),
+  );
 }
 
 function handleNavigation(
@@ -35,7 +32,16 @@ function handleNavigation(
 ): void {
   if (details.frameId !== 0) return;
   updateBadgeForTab(details.tabId, details.url);
+  enablePanelForTab(details.tabId);
 }
 
 chrome.webNavigation.onCommitted.addListener(handleNavigation);
 chrome.webNavigation.onHistoryStateUpdated.addListener(handleNavigation);
+
+chrome.tabs.onActivated.addListener(({ tabId }) => {
+  enablePanelForTab(tabId);
+});
+
+chrome.action.onClicked.addListener(({ id }) => {
+  if (id !== undefined) ignoreClosedTabErrors(chrome.sidePanel.open({ tabId: id }));
+});
