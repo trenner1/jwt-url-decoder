@@ -42,6 +42,4 @@ chrome.tabs.onActivated.addListener(({ tabId }) => {
   enablePanelForTab(tabId);
 });
 
-chrome.action.onClicked.addListener(({ id }) => {
-  if (id !== undefined) ignoreClosedTabErrors(chrome.sidePanel.open({ tabId: id }));
-});
+ignoreClosedTabErrors(chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }));

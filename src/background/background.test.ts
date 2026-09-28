@@ -17,7 +17,6 @@ function stubChrome() {
     committed: [],
     history: [],
     activated: [],
-    clicked: [],
   };
 
   const record = (name: string) => (args: unknown) => {
@@ -32,11 +31,10 @@ function stubChrome() {
     action: {
       setBadgeText: record("setBadgeText"),
       setBadgeBackgroundColor: record("setBadgeBackgroundColor"),
-      onClicked: collect("clicked"),
     },
     sidePanel: {
       setOptions: record("setOptions"),
-      open: record("open"),
+      setPanelBehavior: record("setPanelBehavior"),
     },
     webNavigation: {
       onCommitted: collect("committed"),
@@ -177,21 +175,11 @@ describe("background worker side panel wiring", () => {
     ]);
   });
 
-  it("opens the panel as the very first call in the click handler", async () => {
+  it("lets the toolbar icon toggle the panel open and closed", async () => {
     const worker = await loadWorker();
-    worker.calls.length = 0;
 
-    worker.fire("clicked", { id: 12 });
-
-    expect(worker.calls[0]).toEqual({ name: "open", args: { tabId: 12 } });
-  });
-
-  it("does not open a panel for a tab with no id", async () => {
-    const worker = await loadWorker();
-    worker.calls.length = 0;
-
-    worker.fire("clicked", { id: undefined });
-
-    expect(worker.argsFor("open")).toEqual([]);
+    expect(worker.argsFor("setPanelBehavior")).toEqual([
+      { openPanelOnActionClick: true },
+    ]);
   });
 });
