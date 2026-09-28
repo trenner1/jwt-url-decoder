@@ -7,7 +7,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "build": "esbuild src/background/background.ts src/panel/panel.ts --bundle --outdir=dist --entry-names=[name] --target=chrome116"
+    "build": "esbuild src/background/background.ts src/panel/panel.ts --bundle --outdir=dist --entry-names=[name] --target=chrome116",
+    "package": "npm run build && rm -f jwt-url-decoder.zip && zip -r jwt-url-decoder.zip manifest.json panel.html panel.css dist icons"
   },
   "devDependencies": {
     "@types/chrome": "^0.2.5",

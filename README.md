@@ -120,16 +120,15 @@ This is the entire point, so it's worth being precise.
 - **No message passing of token data.** The panel decodes the active tab's URL
   itself rather than being handed decoded tokens.
 
-It does request the `<all_urls>` host permission, which is the scariest-looking
-line in the manifest. It needs it because a passive badge has to be able to see
-every tab's URL, and `activeTab` only grants access after you click, which would
-defeat the entire feature. The broad *grant* is offset by the narrow
-*behaviour* above: reading the URL is all it ever does with it.
+It requests no host permissions: it never reads or changes page content. It
+does request `tabs`, because the panel reads the active tab's URL and Chrome
+only exposes tab URLs to extensions that hold it. Reading the URL is all it
+ever does with it. The full policy is in [PRIVACY.md](PRIVACY.md).
 
-Other permissions: `webNavigation` (to know when a tab's URL changed, including
-client-side route changes) and `sidePanel` (to show the panel). Notably absent
-is `clipboardWrite`: the copy buttons ride the user gesture of their own click,
-so the permission isn't needed.
+The other permissions are `webNavigation` (to know when a tab's URL changed,
+including client-side route changes) and `sidePanel` (to show the panel).
+Notably absent is `clipboardWrite`: the copy buttons ride the user gesture of
+their own click, so the permission isn't needed.
 
 ## How it's put together
 
@@ -155,6 +154,7 @@ would light up the badge.
 npm test        # vitest
 npm run typecheck
 npm run build   # esbuild, both bundles into dist/
+npm run package # build, then zip the extension for the Chrome Web Store
 ```
 
 ## Where the design decisions live
